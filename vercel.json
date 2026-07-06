@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/birthday.html"
+      "destination": "/index.html"
     },
     {
       "source": "/birthday",
-      "destination": "/birthday.html"
+      "destination": "/index.html"
     }
   ]
 }
