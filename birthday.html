@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100-Day Birthday Treat Vote | သျှင်းသုသဒ္ဓါချို</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --paper: #fffaf5;
+            --ink: #2d2521;
+            --muted: #786a61;
+            --line: #ead8ca;
+            --panel: #fffefd;
+            --rose: #de4f6b;
+            --rose-dark: #b93652;
+            --mint: #2f9b84;
+            --saffron: #f0b842;
+            --lavender: #7461a8;
+            --shadow: 0 1.25rem 3rem rgba(85, 54, 36, 0.12);
+            --radius: 0.5rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Trebuchet MS", "Noto Sans Myanmar", "Padauk", sans-serif;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(240, 184, 66, 0.24), transparent 18rem),
+                radial-gradient(circle at 86% 8%, rgba(222, 79, 107, 0.16), transparent 17rem),
+                linear-gradient(135deg, #fffaf5 0%, #fff1ea 48%, #f7fbf6 100%);
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            min-height: 2.75rem;
+        }
+
+        .page {
+            width: min(100%, 74rem);
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .event-strip {
+            display: grid;
+            gap: 0.75rem;
+            padding: 1rem 0 0.75rem;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: fit-content;
+            color: var(--rose-dark);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .brand-mark::before {
+            content: "";
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            background:
+                linear-gradient(90deg, transparent 46%, rgba(255,255,255,0.75) 47% 53%, transparent 54%),
+                linear-gradient(135deg, var(--rose), var(--saffron));
+            box-shadow: 0 0.35rem 0.9rem rgba(222, 79, 107, 0.22);
+        }
+
+        .event-title {
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin: 0;
+        }
+
+        h1 {
+            max-width: 18ch;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 2.1rem;
+            line-height: 1.04;
+            letter-spacing: 0;
+        }
+
+        .name-mm {
+            color: var(--rose-dark);
+            font-family: "Noto Sans Myanmar", "Padauk", sans-serif;
+            font-size: 1.45rem;
+            line-height: 1.35;
+        }
+
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            color: var(--muted);
+            font-size: 0.96rem;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 2.25rem;
+            padding: 0.4rem 0.7rem;
+            border: 1px solid var(--line);
+            border-radius: 999rem;
+            background: rgba(255, 255, 255, 0.66);
+            color: var(--ink);
+            font-weight: 800;
+        }
+
+        .app-layout {
+            display: grid;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .panel {
+            background: rgba(255, 254, 253, 0.92);
+            border: 1px solid rgba(234, 216, 202, 0.9);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(0.5rem);
+        }
+
+        .vote-panel {
+            padding: 1rem;
+        }
+
+        .dashboard-panel {
+            padding: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-head {
+            display: grid;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .eyebrow {
+            color: var(--rose-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+
+        .section-head h2 {
+            font-size: 1.35rem;
+            line-height: 1.18;
+        }
+
+        .section-head p {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.45rem;
+            margin-bottom: 0.85rem;
+        }
+
+        label,
+        .field-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            min-height: 3rem;
+            padding: 0.78rem 0.85rem;
+            border: 1.5px solid var(--line);
+            border-radius: var(--radius);
+            background: #fff;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--rose);
+            box-shadow: 0 0 0 0.18rem rgba(222, 79, 107, 0.14);
+        }
+
+        .action-row {
+            display: grid;
+            gap: 0.65rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.78rem 0.95rem;
+            border: 1.5px solid transparent;
+            border-radius: var(--radius);
+            background: var(--rose);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 900;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease, opacity 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--rose-dark);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            border-color: var(--line);
+            color: var(--ink);
+        }
+
+        .btn-secondary:hover {
+            background: #fff6f2;
+            border-color: #dbbea9;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.65rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .menu-card {
+            display: grid;
+            grid-template-columns: 5rem 1fr auto;
+            gap: 0.65rem;
+            align-items: stretch;
+            min-height: 6rem;
+            padding: 0.55rem;
+            border: 1.5px solid var(--line);
+            border-radius: var(--radius);
+            background: #fff;
+            color: var(--ink);
+            text-align: left;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+
+        .menu-card:hover {
+            border-color: rgba(222, 79, 107, 0.75);
+            transform: translateY(-1px);
+        }
+
+        .menu-card.selected {
+            border-color: var(--rose);
+            background: #fff7f7;
+            box-shadow: inset 0 0 0 1px rgba(222, 79, 107, 0.2);
+        }
+
+        .menu-card.has-controls {
+            grid-template-columns: 5rem 1fr auto;
+        }
+
+        .menu-card img {
+            width: 100%;
+            height: 100%;
+            min-height: 4.8rem;
+            object-fit: cover;
+            border-radius: calc(var(--radius) - 0.1rem);
+            background: #f5e9dc;
+        }
+
+        .menu-copy {
+            display: grid;
+            gap: 0.35rem;
+            align-content: center;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .menu-name {
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .menu-mm {
+            color: var(--muted);
+            font-family: "Noto Sans Myanmar", "Padauk", sans-serif;
+            font-size: 0.92rem;
+            line-height: 1.35;
+        }
+
+        .menu-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .mini-chip {
+            padding: 0.18rem 0.42rem;
+            border-radius: 999rem;
+            background: #f8eee7;
+        }
+
+        .menu-vote-btn {
+            align-self: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            min-width: 3rem;
+            min-height: 3rem;
+            border: 1.5px solid transparent;
+            border-radius: 50%;
+            background: var(--rose);
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 900;
+            line-height: 1;
+            transition: background 0.2s ease, transform 0.16s ease, opacity 0.2s ease;
+        }
+
+        .menu-vote-btn:hover {
+            background: var(--rose-dark);
+            transform: translateY(-1px);
+        }
+
+        .menu-vote-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.56;
+            transform: none;
+        }
+
+        .card-options {
+            grid-column: 1 / -1;
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 0.15rem;
+            padding: 0.75rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: #fffaf7;
+            animation: fadeIn 0.22s ease;
+        }
+
+        .meat-option-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .meat-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.45rem;
+        }
+
+        .meat-btn {
+            min-height: 2.75rem;
+            padding: 0.55rem 0.65rem;
+            border: 1.5px solid var(--line);
+            border-radius: var(--radius);
+            background: #fff;
+            color: var(--ink);
+            cursor: pointer;
+            font-weight: 900;
+            transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .meat-btn:hover {
+            border-color: var(--mint);
+        }
+
+        .meat-btn.selected {
+            border-color: var(--mint);
+            background: var(--mint);
+            color: #fff;
+        }
+
+        .card-helper {
+            color: var(--muted);
+            font-size: 0.86rem;
+            line-height: 1.35;
+        }
+
+        .summary-box {
+            display: grid;
+            gap: 0.45rem;
+            margin-bottom: 0.85rem;
+            padding: 0.95rem;
+            border: 1px dashed #d9b9a4;
+            border-radius: var(--radius);
+            background: #fff8f2;
+        }
+
+        .summary-user {
+            color: var(--muted);
+            font-weight: 900;
+        }
+
+        .summary-dish {
+            color: var(--rose-dark);
+            font-size: 1.2rem;
+            font-weight: 900;
+            line-height: 1.25;
+        }
+
+        .summary-note {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.45;
+            margin-bottom: 0.85rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.65rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .stat {
+            display: grid;
+            gap: 0.2rem;
+            padding: 0.7rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: #fff;
+        }
+
+        .stat-number {
+            color: var(--rose-dark);
+            font-size: 1.35rem;
+            font-weight: 900;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .dashboard-block {
+            display: grid;
+            gap: 0.6rem;
+        }
+
+        .block-title {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .rank-list,
+        .guest-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .guest-list {
+            gap: 0.35rem;
+        }
+
+        .rank-row,
+        .guest-row {
+            display: grid;
+            gap: 0.35rem;
+            padding: 0.68rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: #fff;
+        }
+
+        .guest-row {
+            gap: 0.18rem;
+            padding: 0.5rem 0.58rem;
+        }
+
+        .rank-row {
+            cursor: pointer;
+        }
+
+        .rank-row.active {
+            border-color: var(--rose);
+            background: #fff7f7;
+        }
+
+        .rank-top,
+        .guest-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            font-weight: 900;
+        }
+
+        .rank-name,
+        .guest-name {
+            min-width: 0;
+            line-height: 1.25;
+        }
+
+        .guest-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.94rem;
+        }
+
+        .vote-count {
+            flex: 0 0 auto;
+            padding: 0.18rem 0.48rem;
+            border-radius: 999rem;
+            background: #f9e1e5;
+            color: var(--rose-dark);
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .guest-row .vote-count {
+            padding: 0.12rem 0.4rem;
+            font-size: 0.74rem;
+        }
+
+        .row-meta {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .guest-meta {
+            display: block;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 0.78rem;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            padding: 0.8rem;
+            border: 1px dashed var(--line);
+            border-radius: var(--radius);
+            color: var(--muted);
+            background: #fffaf7;
+            line-height: 1.45;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 1rem;
+            z-index: 20;
+            width: min(calc(100% - 2rem), 26rem);
+            padding: 0.75rem 0.9rem;
+            border-radius: var(--radius);
+            background: var(--ink);
+            color: #fff;
+            text-align: center;
+            font-weight: 900;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, 0.8rem);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(0.35rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (min-width: 640px) {
+            .page {
+                padding: 1.4rem;
+            }
+
+            .event-strip {
+                grid-template-columns: 1fr auto;
+                align-items: end;
+            }
+
+            h1 {
+                font-size: 2.75rem;
+            }
+
+            .name-mm {
+                font-size: 1.65rem;
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .menu-card {
+                grid-template-columns: 1fr auto;
+            }
+
+            .menu-card img {
+                grid-column: 1 / -1;
+                height: 8.4rem;
+            }
+
+            .menu-vote-btn {
+                align-self: center;
+                justify-self: end;
+            }
+
+            .action-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .btn-primary-wide {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .page {
+                padding: 1.8rem;
+            }
+
+            .app-layout {
+                grid-template-columns: minmax(0, 1.05fr) minmax(22rem, 0.72fr);
+            }
+
+            .vote-panel,
+            .dashboard-panel {
+                padding: 1.2rem;
+            }
+
+            .dashboard-panel {
+                position: sticky;
+                top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header class="event-strip">
+            <div class="event-title">
+                <span class="brand-mark">100-Day Treat</span>
+                <h1>Shinn Thu Thadar Cho</h1>
+                <p class="name-mm">သျှင်းသုသဒ္ဓါချို</p>
+            </div>
+            <div class="event-meta" aria-label="100-day birthday event details">
+                <span class="pill">08 . July . 2026</span>
+                <span class="pill">100-day birthday</span>
+                <span class="pill">Menu vote</span>
+            </div>
+        </header>
+
+        <section class="app-layout" aria-label="100-day birthday treat voting app">
+            <div class="panel vote-panel">
+                <div id="step-register">
+                    <div class="section-head">
+                        <span class="eyebrow">Guest entry</span>
+                        <h2>Choose your menu for my daughter's 100-day birthday treat</h2>
+                        <p>သမီးလေးရဲ့ ရက် ၁၀၀ ပြည့် အမှတ်တရအတွက် ဧည့်ခံမယ့် အစားအစာကို ရွေးပေးပါ။</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Your real name</label>
+                        <input type="text" id="username" placeholder="e.g., Jane Doe" autocomplete="name">
+                    </div>
+                    <button class="btn btn-primary-wide" type="button" onclick="goToVoting()">View Menu</button>
+                </div>
+
+                <div id="step-vote" class="hidden">
+                    <div class="section-head">
+                        <span class="eyebrow">Menu choice</span>
+                        <h2 id="welcome-msg">Choose your 100-day treat menu</h2>
+                        <p id="vote-helper">Tap the vote icon on a menu card. Meat choices open inside that card when needed.</p>
+                    </div>
+
+                    <div class="menu-grid" id="menu-container"></div>
+
+                    <div class="action-row">
+                        <button class="btn btn-secondary" type="button" onclick="backToName()">Back</button>
+                    </div>
+                </div>
+
+                <div id="step-summary" class="hidden">
+                    <div class="section-head">
+                        <span class="eyebrow">Saved choice</span>
+                        <h2>Thank you for voting</h2>
+                        <p>သင်ရွေးချယ်ထားသော အစားအစာကို သိမ်းထားပြီးပါပြီ။</p>
+                    </div>
+
+                    <div class="summary-box">
+                        <p id="summary-user" class="summary-user"></p>
+                        <p id="summary-dish" class="summary-dish"></p>
+                        <p id="summary-meat"></p>
+                    </div>
+
+                    <p id="summary-note" class="summary-note"></p>
+                    <div class="action-row">
+                        <button class="btn" type="button" onclick="resetVote()">Change My Choice</button>
+                        <button class="btn btn-secondary" type="button" onclick="startNewGuest()">New Guest</button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="panel dashboard-panel" aria-label="Treat dashboard">
+                <div class="dashboard-header">
+                    <div>
+                        <span class="eyebrow">Dashboard</span>
+                        <h2>Live treat list</h2>
+                    </div>
+                    <span class="pill" id="total-votes-count">0 votes</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat">
+                        <span class="stat-number" id="guest-count">0</span>
+                        <span class="stat-label">Guests</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="leading-count">0</span>
+                        <span class="stat-label">Top menu votes</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-block">
+                        <div class="block-title">Menu ranking</div>
+                        <div id="dashboard-rows" class="rank-list"></div>
+                    </div>
+                    <div class="dashboard-block">
+                        <div class="block-title">Guest choices</div>
+                        <div id="dashboard-voters" class="guest-list"></div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <div id="success-toast" class="toast">Vote saved</div>
+
+    <script>
+        const STORAGE_KEY = 'birthday-treat-votes-v2';
+        const API_VOTES_URL = '/api/votes';
+
+        const menuItems = [
+            { id: 'fried-noodle', name: 'Fried Noodle', nameMm: 'ခေါက်ဆွဲကြော်', image: 'https://images.deliveryhero.io/image/fd-mm/Products/3127286.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] },
+            { id: 'fried-rice', name: 'Fried Rice', nameMm: 'ထမင်းကြော်', image: 'https://images.deliveryhero.io/image/fd-mm/products/65255.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] },
+            { id: 'steamed-rice-assorted', name: 'Steamed Rice with Assorted Vegetables', nameMm: 'ထမင်းပေါင်း', image: 'https://images.deliveryhero.io/image/fd-mm/Products/3127295.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] },
+            { id: 'pushu-fried-rice', name: 'Pushu Fried Rice', nameMm: 'ပသျှူး ထမင်းကြော်', image: 'https://images.deliveryhero.io/image/fd-mm/products/65257.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] },
+            { id: 'fish-paste-fried-rice', name: 'Fish Paste Fried Rice', nameMm: 'ငါးပိ ထမင်းကြော်', image: 'https://images.deliveryhero.io/image/fd-mm/products/65258.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] },
+            { id: 'stir-fried-rice-noodle', name: 'Stir Fried Rice Noodle', nameMm: 'ကတ်ကြေးကိုက်', image: 'https://images.deliveryhero.io/image/fd-mm/Products/3127298.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] },
+            { id: 'grilled-pork-belly-steamed-rice', name: 'Grilled Pork Belly Steamed Rice with Assorted Vegetables', nameMm: 'အခေါက်ကင်ထမင်းပေါင်း', image: 'https://images.deliveryhero.io/image/fd-mm/products/65261.jpg?width=360&height=260', meats: ['ဝက်'] },
+            { id: 'grilled-meat-steamed-rice', name: 'Grilled Meat Steamed Rice with Assorted Vegetables', nameMm: 'အသားကင်ထမင်းပေါင်း', image: 'https://images.deliveryhero.io/image/fd-mm/products/65262.jpg?width=360&height=260', meats: ['ဝက်'] },
+            { id: 'phat-kaphrao-rice', name: 'Phat Kaphrao Rice', nameMm: 'ဖက်ကဖောင်ထမင်း', image: 'https://images.deliveryhero.io/image/fd-mm/Products/3127307.jpg?width=360&height=260', meats: ['ကြက်', 'ဝက်', 'ပင်လယ်စာ'] }
+        ];
+
+        let votesDatabase = loadCachedVotes();
+        let selectedDashboardMenuId = null;
+        let isSavingVote = false;
+
+        let userState = {
+            name: '',
+            selectedMenu: null,
+            selectedMeat: null,
+            selectedSecondMeat: null
+        };
+
+        updateDashboard();
+        refreshVotesFromApi();
+
+        function loadCachedVotes() {
+            try {
+                const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                if (Object.keys(current).length) {
+                    return current;
+                }
+
+                const legacy = JSON.parse(localStorage.getItem('birthday-treat-votes-v1') || '{}');
+                return legacy && typeof legacy === 'object' ? legacy : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function saveCachedVotes() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(votesDatabase));
+        }
+
+        async function refreshVotesFromApi() {
+            try {
+                const response = await fetch(API_VOTES_URL, {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Vote API is not available.');
+                }
+
+                const data = await response.json();
+                if (data.votes && typeof data.votes === 'object') {
+                    votesDatabase = data.votes;
+                    saveCachedVotes();
+                    updateDashboard();
+                }
+            } catch (error) {
+                // Local file preview has no Vercel API, so the page keeps using localStorage.
+            }
+        }
+
+        async function saveVoteToApi(vote) {
+            const response = await fetch(API_VOTES_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(vote)
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.error || 'Unable to save vote.');
+            }
+
+            return data;
+        }
+
+        function getVoteKey(name) {
+            return name.trim().replace(/\s+/g, ' ').toLowerCase();
+        }
+
+        function getMenuById(menuId) {
+            return menuItems.find(item => item.id === menuId) || null;
+        }
+
+        function getMenuLabel(item) {
+            return item.nameMm ? `${item.name} / ${item.nameMm}` : item.name;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function goToVoting() {
+            const nameInput = document.getElementById('username').value.trim();
+            if (!nameInput) {
+                showSuccessToast('Please enter your real name.');
+                return;
+            }
+
+            userState.name = nameInput;
+            const existingVote = votesDatabase[getVoteKey(userState.name)];
+
+            if (existingVote) {
+                userState.selectedMenu = getMenuById(existingVote.menuId);
+                userState.selectedMeat = existingVote.meat || null;
+                userState.selectedSecondMeat = existingVote.secondMeat || null;
+                showSummaryPage(true);
+                return;
+            }
+
+            userState.selectedMenu = null;
+            userState.selectedMeat = null;
+            userState.selectedSecondMeat = null;
+            showVotePage();
+        }
+
+        function showVotePage() {
+            document.getElementById('welcome-msg').innerText = `${userState.name}, choose your 100-day treat menu`;
+            document.getElementById('step-register').classList.add('hidden');
+            document.getElementById('step-summary').classList.add('hidden');
+            document.getElementById('step-vote').classList.remove('hidden');
+            renderMenu();
+        }
+
+        function backToName() {
+            document.getElementById('step-vote').classList.add('hidden');
+            document.getElementById('step-summary').classList.add('hidden');
+            document.getElementById('step-register').classList.remove('hidden');
+        }
+
+        function startNewGuest() {
+            userState = {
+                name: '',
+                selectedMenu: null,
+                selectedMeat: null,
+                selectedSecondMeat: null
+            };
+            document.getElementById('username').value = '';
+            backToName();
+            document.getElementById('username').focus();
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = menuItems.map(item => {
+                const isSelected = userState.selectedMenu?.id === item.id;
+                const meatText = item.meats.length > 1 ? 'Meat options' : item.meats.length === 1 ? item.meats[0] : 'Standard';
+                const hasEnoughChoice = item.meats.length === 0 || userState.selectedMeat || item.meats.length === 1;
+                const voteTitle = isSelected && hasEnoughChoice ? 'Save this vote' : 'Choose this menu';
+                const voteIcon = isSavingVote && isSelected ? '...' : isSelected && hasEnoughChoice ? '&#10003;' : '&#10084;';
+                return `
+                    <article class="menu-card ${isSelected ? 'selected has-controls' : ''}" onclick="selectMenu('${item.id}')">
+                        <img src="${item.image}" alt="${item.name}" loading="lazy">
+                        <span class="menu-copy">
+                            <span class="menu-name">${item.name}</span>
+                            <span class="menu-mm">${item.nameMm}</span>
+                            <span class="menu-meta">
+                                <span class="mini-chip">${meatText}</span>
+                            </span>
+                        </span>
+                        <button
+                            class="menu-vote-btn"
+                            type="button"
+                            title="${voteTitle}"
+                            aria-label="${voteTitle}"
+                            onclick="voteFromCard(event, '${item.id}')"
+                            ${isSavingVote ? 'disabled' : ''}>
+                            ${voteIcon}
+                        </button>
+                        ${isSelected ? renderCardOptions(item) : ''}
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderCardOptions(item) {
+            if (item.meats.length === 0) {
+                return '<div class="card-options"><div class="card-helper">Standard serving. Tap the vote icon to save.</div></div>';
+            }
+
+            const backupOptions = item.meats.length > 1
+                ? `
+                    <div class="meat-option-group">
+                        <div class="field-label">Backup meat</div>
+                        <div class="meat-options">${renderMeatButtons('second', item.meats, userState.selectedSecondMeat)}</div>
+                    </div>
+                `
+                : '';
+
+            return `
+                <div class="card-options" onclick="event.stopPropagation()">
+                    <div class="meat-option-group">
+                        <div class="field-label">First meat</div>
+                        <div class="meat-options">${renderMeatButtons('first', item.meats, userState.selectedMeat)}</div>
+                    </div>
+                    ${backupOptions}
+                    <div class="card-helper">${userState.selectedMeat ? 'Tap the vote icon to save this card.' : 'Choose first meat to enable this vote.'}</div>
+                </div>
+            `;
+        }
+
+        function selectMenu(itemId) {
+            const item = getMenuById(itemId);
+            if (!item) {
+                return;
+            }
+
+            if (userState.selectedMenu?.id !== item.id) {
+                userState.selectedMeat = item.meats.length === 1 ? item.meats[0] : null;
+                userState.selectedSecondMeat = null;
+            }
+
+            userState.selectedMenu = item;
+            renderMenu();
+        }
+
+        function renderMeatButtons(group, meats, selectedMeat) {
+            return meats.map(meat => `
+                <button
+                    class="meat-btn ${selectedMeat === meat ? 'selected' : ''}"
+                    type="button"
+                    onclick="selectMeat(event, '${group}', '${meat}')"
+                    aria-pressed="${selectedMeat === meat}">
+                    ${meat}
+                </button>
+            `).join('');
+        }
+
+        function selectMeat(event, group, meat) {
+            event.stopPropagation();
+            if (group === 'first') {
+                userState.selectedMeat = meat;
+            } else {
+                userState.selectedSecondMeat = meat;
+            }
+            renderMenu();
+        }
+
+        function voteFromCard(event, itemId) {
+            event.stopPropagation();
+            const item = getMenuById(itemId);
+            if (!item) {
+                return;
+            }
+
+            if (userState.selectedMenu?.id !== item.id) {
+                selectMenu(item.id);
+            }
+
+            if (item.meats.length > 0 && !userState.selectedMeat) {
+                showSuccessToast('Please choose a first meat option.');
+                return;
+            }
+
+            submitVote();
+        }
+
+        async function submitVote() {
+            if (isSavingVote) {
+                return;
+            }
+
+            if (!userState.selectedMenu) {
+                showSuccessToast('Please choose one menu.');
+                return;
+            }
+
+            if (userState.selectedMenu.meats.length > 0 && !userState.selectedMeat) {
+                showSuccessToast('Please choose a first meat option.');
+                return;
+            }
+
+            const vote = {
+                displayName: userState.name.trim().replace(/\s+/g, ' '),
+                menuId: userState.selectedMenu.id,
+                menuName: userState.selectedMenu.name,
+                menuNameMm: userState.selectedMenu.nameMm,
+                meat: userState.selectedMeat,
+                secondMeat: userState.selectedSecondMeat || null,
+                votedAt: new Date().toISOString()
+            };
+
+            isSavingVote = true;
+            renderMenu();
+
+            votesDatabase[getVoteKey(userState.name)] = vote;
+            saveCachedVotes();
+            updateDashboard();
+
+            try {
+                const data = await saveVoteToApi(vote);
+                if (data.votes && typeof data.votes === 'object') {
+                    votesDatabase = data.votes;
+                    saveCachedVotes();
+                    updateDashboard();
+                }
+                showSuccessToast('Vote saved to Vercel JSON.');
+            } catch (error) {
+                showSuccessToast('Saved on this device. Vercel API is not ready yet.');
+            } finally {
+                isSavingVote = false;
+                renderMenu();
+                showSummaryPage(false);
+            }
+
+            if (window.confetti) {
+                confetti({ particleCount: 80, spread: 62, origin: { y: 0.62 } });
+            }
+        }
+
+        function showSummaryPage(isExistingVote = false) {
+            if (!userState.selectedMenu) {
+                backToName();
+                return;
+            }
+
+            document.getElementById('summary-user').innerText = `${userState.name}'s choice`;
+            document.getElementById('summary-dish').innerText = getMenuLabel(userState.selectedMenu);
+            document.getElementById('summary-meat').innerText = formatMeatChoice(userState.selectedMeat, userState.selectedSecondMeat);
+            document.getElementById('summary-note').innerText = isExistingVote
+                ? 'This name already has a saved vote. You can update it before the 100-day treat.'
+                : 'Your selection is now visible in the dashboard list.';
+
+            document.getElementById('step-register').classList.add('hidden');
+            document.getElementById('step-vote').classList.add('hidden');
+            document.getElementById('step-summary').classList.remove('hidden');
+        }
+
+        function resetVote() {
+            showVotePage();
+        }
+
+        function formatMeatChoice(meat, secondMeat) {
+            if (!meat) {
+                return 'Standard serving';
+            }
+
+            return secondMeat
+                ? `First: ${meat} | Backup: ${secondMeat}`
+                : `First: ${meat}`;
+        }
+
+        function showSuccessToast(message) {
+            const toast = document.getElementById('success-toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            clearTimeout(showSuccessToast.timeoutId);
+            showSuccessToast.timeoutId = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1900);
+        }
+
+        function selectDashboardMenu(itemId) {
+            selectedDashboardMenuId = itemId;
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const dashContainer = document.getElementById('dashboard-rows');
+            const voterContainer = document.getElementById('dashboard-voters');
+            const votes = Object.values(votesDatabase);
+            const totalVotes = votes.length;
+
+            const dynamicCounts = menuItems.map(item => {
+                const voters = votes
+                    .filter(vote => vote.menuId === item.id)
+                    .map(vote => ({
+                        name: vote.displayName,
+                        meat: vote.meat || null,
+                        secondMeat: vote.secondMeat || null
+                    }));
+
+                return {
+                    ...item,
+                    voters,
+                    count: voters.length
+                };
+            });
+
+            dynamicCounts.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+            const highestCount = Math.max(...dynamicCounts.map(item => item.count), 0);
+            const leadingMenu = dynamicCounts.find(item => item.count === highestCount && item.count > 0);
+            const selectedMenu = dynamicCounts.find(item => item.id === selectedDashboardMenuId) || leadingMenu || dynamicCounts[0];
+            selectedDashboardMenuId = selectedMenu?.id || null;
+
+            document.getElementById('total-votes-count').innerText = `${totalVotes} vote${totalVotes === 1 ? '' : 's'}`;
+            document.getElementById('guest-count').innerText = totalVotes;
+            document.getElementById('leading-count').innerText = highestCount;
+
+            dashContainer.innerHTML = dynamicCounts.map(item => {
+                const isLeading = item.count > 0 && item.count === highestCount;
+                return `
+                    <button class="rank-row ${item.id === selectedDashboardMenuId ? 'active' : ''}" type="button" onclick="selectDashboardMenu('${item.id}')">
+                        <span class="rank-top">
+                            <span class="rank-name">${isLeading ? 'Top: ' : ''}${item.name}</span>
+                            <span class="vote-count">${item.count}</span>
+                        </span>
+                        <span class="row-meta">${item.nameMm} ${item.count > 0 ? `| ${item.count} guest${item.count === 1 ? '' : 's'}` : '| No votes yet'}</span>
+                    </button>
+                `;
+            }).join('');
+
+            if (!totalVotes) {
+                voterContainer.innerHTML = '<div class="empty-state">Guest choices will appear here after votes are saved.</div>';
+                return;
+            }
+
+            const sortedVotes = votes
+                .slice()
+                .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+
+            voterContainer.innerHTML = sortedVotes.map(vote => {
+                const menu = getMenuById(vote.menuId);
+                const menuLabel = menu ? getMenuLabel(menu) : vote.menuName;
+                const meatLabel = vote.secondMeat
+                    ? `${vote.meat || 'Menu'} / ${vote.secondMeat}`
+                    : vote.meat || 'Menu';
+                return `
+                    <div class="guest-row">
+                        <span class="guest-top">
+                            <span class="guest-name">${escapeHtml(vote.displayName)}</span>
+                            <span class="vote-count">${escapeHtml(meatLabel)}</span>
+                        </span>
+                        <span class="guest-meta">${escapeHtml(menuLabel)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
