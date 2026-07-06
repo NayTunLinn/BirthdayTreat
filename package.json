@@ -2,10 +2,12 @@
   "name": "birthday-treat-vote",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "check": "node --check api/votes.js"
   },
   "dependencies": {
-    "@vercel/blob": "latest"
+    "@vercel/blob": "latest",
+    "dotenv": "^16.1.4"
   }
 }
