@@ -86,10 +86,14 @@ async function writeVotes(votes, etag) {
 
 export async function GET() {
   try {
+    if (!BLOB_STORE_ID || !BLOB_READ_WRITE_TOKEN) {
+      return json({ error: 'Server misconfiguration: missing BLOB_STORE_ID or BLOB_READ_WRITE_TOKEN environment variables.' }, 500);
+    }
+
     const { votes } = await readVotes();
     return json({ votes });
   } catch (error) {
-    return json({ error: 'Unable to load votes.' }, 500);
+    return json({ error: String(error?.message || 'Unable to load votes.') }, 500);
   }
 }
 
@@ -111,6 +115,10 @@ export async function POST(request) {
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
+      if (!BLOB_STORE_ID || !BLOB_READ_WRITE_TOKEN) {
+        return json({ error: 'Server misconfiguration: missing BLOB_STORE_ID or BLOB_READ_WRITE_TOKEN environment variables.' }, 500);
+      }
+
       const { votes, etag } = await readVotes();
       votes[voteKey] = vote;
       await writeVotes(votes, etag);
@@ -118,7 +126,7 @@ export async function POST(request) {
     } catch (error) {
       const retryable = error?.name === 'BlobPreconditionFailedError' || String(error?.message || '').includes('precondition');
       if (!retryable || attempt === 2) {
-        return json({ error: 'Unable to save vote.' }, 500);
+        return json({ error: String(error?.message || 'Unable to save vote.') }, 500);
       }
     }
   }
