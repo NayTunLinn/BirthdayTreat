@@ -882,14 +882,10 @@
 
             const data = await response.json().catch(() => ({}));
             if (!response.ok) {
-                throw new Error(data.details || data.error || 'Unable to save vote.');
+                throw new Error(data.error || 'Unable to save vote.');
             }
 
             return data;
-        }
-
-        function isLocalPreview() {
-            return window.location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(window.location.hostname);
         }
 
         function getVoteKey(name) {
@@ -1107,27 +1103,24 @@
             isSavingVote = true;
             renderMenu();
 
+            votesDatabase[getVoteKey(userState.name)] = vote;
+            saveCachedVotes();
+            updateDashboard();
+
             try {
-                if (isLocalPreview()) {
-                    votesDatabase[getVoteKey(userState.name)] = vote;
+                const data = await saveVoteToApi(vote);
+                if (data.votes && typeof data.votes === 'object') {
+                    votesDatabase = data.votes;
                     saveCachedVotes();
                     updateDashboard();
-                    showSuccessToast('Saved locally for preview.');
-                } else {
-                    const data = await saveVoteToApi(vote);
-                    if (data.votes && typeof data.votes === 'object') {
-                        votesDatabase = data.votes;
-                        saveCachedVotes();
-                        updateDashboard();
-                    }
-                    showSuccessToast('Vote saved to Vercel JSON.');
                 }
-                showSummaryPage(false);
+                showSuccessToast('Vote saved to Vercel JSON.');
             } catch (error) {
-                showSuccessToast(`Vercel JSON save failed: ${error.message}`);
+                showSuccessToast('Saved on this device. Vercel API is not ready yet.');
             } finally {
                 isSavingVote = false;
                 renderMenu();
+                showSummaryPage(false);
             }
 
             if (window.confetti) {
@@ -1174,7 +1167,7 @@
             clearTimeout(showSuccessToast.timeoutId);
             showSuccessToast.timeoutId = setTimeout(() => {
                 toast.classList.remove('show');
-            }, message.length > 80 ? 5200 : 2200);
+            }, 1900);
         }
 
         function selectDashboardMenu(itemId) {
