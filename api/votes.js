@@ -13,6 +13,27 @@ function json(data, status = 200) {
   });
 }
 
+function getStorageStatus() {
+  const hasReadWriteToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  const hasOidc = Boolean(process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN);
+
+  return {
+    ready: hasReadWriteToken || hasOidc,
+    authMode: hasOidc ? 'oidc' : hasReadWriteToken ? 'read-write-token' : 'missing'
+  };
+}
+
+function assertStorageReady() {
+  const status = getStorageStatus();
+  if (!status.ready) {
+    throw new Error('Vercel Blob is not connected. Connect a Blob store to this Vercel project so BLOB_STORE_ID and VERCEL_OIDC_TOKEN, or BLOB_READ_WRITE_TOKEN, are available.');
+  }
+}
+
+function getErrorMessage(error) {
+  return error instanceof Error ? error.message : String(error || 'Unknown error');
+}
+
 function getVoteKey(name) {
   return String(name || '').trim().replace(/\s+/g, ' ').toLowerCase();
 }
@@ -41,6 +62,8 @@ function sanitizeVote(input) {
 }
 
 async function readVotes() {
+  assertStorageReady();
+
   const result = await get(VOTES_PATH, { access: 'private' });
 
   if (!result || result.statusCode !== 200 || !result.stream) {
@@ -58,6 +81,8 @@ async function readVotes() {
 }
 
 async function writeVotes(votes, etag) {
+  assertStorageReady();
+
   const options = {
     access: 'private',
     allowOverwrite: true,
@@ -75,9 +100,14 @@ async function writeVotes(votes, etag) {
 export async function GET() {
   try {
     const { votes } = await readVotes();
-    return json({ votes });
+    return json({ votes, storage: getStorageStatus(), path: VOTES_PATH });
   } catch (error) {
-    return json({ error: 'Unable to load votes.' }, 500);
+    return json({
+      error: 'Unable to load votes.',
+      details: getErrorMessage(error),
+      storage: getStorageStatus(),
+      path: VOTES_PATH
+    }, 500);
   }
 }
 
@@ -106,7 +136,12 @@ export async function POST(request) {
     } catch (error) {
       const retryable = error?.name === 'BlobPreconditionFailedError' || String(error?.message || '').includes('precondition');
       if (!retryable || attempt === 2) {
-        return json({ error: 'Unable to save vote.' }, 500);
+        return json({
+          error: 'Unable to save vote.',
+          details: getErrorMessage(error),
+          storage: getStorageStatus(),
+          path: VOTES_PATH
+        }, 500);
       }
     }
   }
